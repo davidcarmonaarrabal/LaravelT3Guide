@@ -282,6 +282,6 @@ Pedidos::factory(20)->create();
 
 Podemos añadirlo directamente en `UserSeeder`.
 
-Ahora sí, corremos `php artisan migrate:fresh --seed`, habiendo corrido previamente `php artisan migrate`, y ***HE TENIDO ERRORES***, a remarcar, **los teléfonos deben ser strings** y **en la factoría de transportistas el fake de teléfonos estaba mal escrito**.
+Ahora sí, corremos `php artisan migrate:fresh --seed`, habiendo corrido previamente `php artisan migrate`, y ***HE TENIDO ERRORES***, a remarcar, **los teléfonos deben ser strings**, **en la factoría de transportistas el fake de teléfonos estaba mal escrito** y **el modelo de Users no debe tener SoftDelete**.
 
 Una vez todo ejecutado, comprobamos la *BBDD*.    
