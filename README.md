@@ -65,7 +65,7 @@ return new class extends Migration
 };
 ```
 
-Luego, seguimos con **Transportistas**:
+Luego, seguimos con **Transportistas** (`php artisan make:model Transportista -m`):
 
 ```
 return new class extends Migration
@@ -88,7 +88,7 @@ return new class extends Migration
 };
 ```
 
-Y por último, con **Pedidos**:
+Y por último, con **Pedidos** (`php artisan make:model Pedidos -m`):
 
 ```
 return new class extends Migration
@@ -168,6 +168,8 @@ class User extends Authenticatable
 }
 ```
 
+Por último, el de **Transportistas**:
+
 ```
 <?php
 
@@ -189,4 +191,97 @@ class Transportista extends Model
 }
 ```
 
-Y con esto establecemos todos los modelos, 
+Y con esto establecemos todos los modelos.
+
+# 3. CREAMOS LOS SEEDERS
+Ahora, debo crear al menos un **User** (`php artisan make:seed UserSeeder`) de forma manual, para poder iniciar sesión con este:
+
+```
+class UserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        DB::table('users')->insert([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('admin'),
+            'adress' => 'Calle 1A',
+            'telephone' => '612345678'
+        ]);
+    }
+}
+```
+
+Y lo añadimos a `database/seeders/DatabaseSeeder.php`:
+
+```
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->call(UserSeeder::class);
+    }
+}
+```
+
+Y con esto nos creará la *BBDD* con ese usuario si corremos un `php artisan migrate:fresh --seed`, pero es recomendable generar factorías de un par más de **Users**, unos cuantos **Transportistas** y al menos, según pide el ejercicio, 20 **Pedidos**. 
+
+# 4. CREAMOS LAS FACTORÍAS
+Empezamos con la de **Users** (`php artisan make:factory UserFactory`):
+
+```
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+            'telephone' => fake()->phoneNumber(),
+            'adress' => fake()->address(),
+        ];
+```
+
+Y de paso, añadimos en el *seeder* de **Users** `User::factory(4)->create();`. Seguimos con la factoría de **Transportistas** (`php artisan make:factory TransportistaFactory`):
+
+```
+    public function definition(): array
+    {
+        return [
+            'name_trans' => fake()->name(),
+            'telephoen_trans' => fake()->phoneNumber(),
+            'vehicle_type' => fake()->name(),
+        ];
+    }
+}
+```
+
+Y por último, el de **Pedidos** (`php artisan make:factory PedidosFactory`):
+
+```
+public function definition(): array
+    {
+        return [
+            'fecha_pedido' => fake()->date(),
+            'fecha_entrega' => fake()->date(),
+            'status' => 'En entrega',
+            'user_id' => 1,
+            'transportista_id' => 1,
+        ];
+    }
+```
+
+Y ahora, añadimos las factorías a `DatabaseSeeder`:
+
+```
+User::factory(4)->create();
+Transportista::factory(5)->create();
+Pedidos::factory(20)->create();
+```
+
+Podemos añadirlo directamente en `UserSeeder`.
+
+Ahora sí, corremos `php artisan migrate:fresh --seed`, habiendo corrido previamente `php artisan migrate`, y ***HE TENIDO ERRORES***, a remarcar, **los teléfonos deben ser strings** y **en la factoría de transportistas el fake de teléfonos estaba mal escrito**.
+
+Una vez todo ejecutado, comprobamos la *BBDD*.    
