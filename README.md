@@ -284,4 +284,50 @@ Podemos añadirlo directamente en `UserSeeder`.
 
 Ahora sí, corremos `php artisan migrate:fresh --seed`, habiendo corrido previamente `php artisan migrate`, y ***HE TENIDO ERRORES***, a remarcar, **los teléfonos deben ser strings**, **en la factoría de transportistas el fake de teléfonos estaba mal escrito** y **el modelo de Users no debe tener SoftDelete**.
 
-Una vez todo ejecutado, comprobamos la *BBDD*.    
+Una vez todo ejecutado, comprobamos la *BBDD*.
+
+# 5. EMPEZAMOS CON LAS RUTAS DE TRANSPORTISTAS.
+Durante este examen vamos a trabajar con ***rutas***, que básicamente nos van a cambiar el cómo trabajamos con el **CRUD** y con la interacción de la web, lo primero, es tener claro que conforme nos *logeemos*, vamos a tener en el *home* **dos botones**, uno que nos llevará a ver la tabla de **Pedidos** y otro que nos llevará a ver **Transportistas**.
+
+Para esto, vamos a crear el **controlador** para los **Transportistas**, esto desde `/routes/web.php` añadiremos una **ruta** que será algo como `Route::get('/transportistas', [TransportistasController::class, 'index']);` y nos pide un **controlador**, que crearemos ahora con `php artisan make:controller TransportistasController` y se ubicará en `/app/Http/Controllers/TransportistasController.php`:
+
+```
+public function read(){
+    return 'Aquí vemos la info de un transportista';
+}
+
+public function update(){
+    return 'Aquí actualizamos la info de un transportista con un formulario';
+}
+
+public function delete(){
+    return 'Aquí eliminamos dicho transportista';
+}
+```
+
+Introducimos **3 funciones**, por ahora vacías, pero que nos facilitarán el **CRUD**, y ahora, las añadimos a las **rutas**:
+
+```
+Route::get('/', [HomeController::class], 'index']);
+
+Route::get('/transportistas', [TransportistasController::class, 'index']);
+
+Route::get('/transportistas/{transportista}/read', [TransportistasController::class, 'read']);
+
+Route::get('/transportistas/{transportista}/update', [TransportistasController::class, 'update']);
+
+Route::get('/transportistas/{transportista}/delete', [TransportistasController::class, 'delete']);
+```
+
+# 6. VISTAS TRANSPORTISTAS Y HOME.
+
+Empezamos modificando la vista de **home**, para ello vamos a `/resources/views/home.blade.php` y añadimos un contenido **HTML** a nuestro gusto, que llamaremos desde el controlador de Home (`HomeController.php`) con:
+
+```
+class HomeController extends Controller
+{
+    public function index(){
+        return view('home');
+    }
+}
+```
